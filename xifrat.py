@@ -1,7 +1,7 @@
 ## Metode de xifratge substitutiu: PlayFair (poligrafic per parells de lletres)
 ## Metode de transpocicional: Rail Fence
 
-## Xifrat RailFence: Utilitzant la mida de la clau com a nombre de rails, es transposa el text entrant.
+## Xifrat RailFence: Utilitzant la mida de la clau com a nombre de rails es transposa el text entrant.
 ## Xifrat PlayFair: un cop s'ha xifrat el text en clar amb RailFence es xifra amb playFair:
 ##                  - La mida de la taula es de 6x6 (s'eviten collisions de lletres)
 ##                  - Es contemplen els simbols ' ', '.', ',', '?','!','$',':','(',')','-' per completar la taula
@@ -24,43 +24,49 @@ def get_inputs():
     return inFile, outFile, key
 
 
-def get_row_col(board, character, size):
-    for row in range(0,size):
-        for col in range(0,size):
-            if board[row][col] == character:
-                return row, col
-
-    return -1, -1
 
 def encrypt_playfair(key,text):
     board = populate_playfair(BOARD_SIZE,key)
     to_encrypt = preproces_playfair(text)
     result = ""
-    if len(to_encrypt)%2 != 0:
-        to_encrypt += ' '
     print(board)
-    print(key)
-    for i in range(0,len(to_encrypt),2):
-        row, col = get_row_col(board,to_encrypt[i] ,BOARD_SIZE)
-        row2, col2 = get_row_col(board, to_encrypt[i+1],BOARD_SIZE)
+    #if len(to_encrypt)%2 != 0:
+    #    to_encrypt += ' '
+    for i in range(1,len(to_encrypt),2):
+        row, col = get_row_col(board,to_encrypt[i-1] ,BOARD_SIZE)
+        row2, col2 = get_row_col(board, to_encrypt[i],BOARD_SIZE)
         to_add = ''
         to_add2 = ''
-        print(row,col)
-        print(row2,col2)
+
         #Si les files son iguals, s'agafa el de la respectiva dreta circularment
         if row == row2:
-            to_add = board[(row+1)%BOARD_SIZE][col]
-            to_add2 = board[(row2+1)%BOARD_SIZE][col2]
-        elif col == col2:
             to_add = board[row][(col +1)% BOARD_SIZE]
             to_add2 = board[row2][(col2 +1)% BOARD_SIZE]
+        elif col == col2:
+            # si les columnes son iguals, s'agafa el de abaix respectivament circularment
+            to_add = board[(row+1)%BOARD_SIZE][col]
+            to_add2 = board[(row2+1)%BOARD_SIZE][col2]
         else:
+            # altrament s'agafa el de la diagonal oposada
             to_add = board[row][col2]
             to_add2 = board[row2][col]
 
         result += to_add + to_add2
 
-
     return result
 
-print(encrypt_playfair("ab","abc"))
+def encrypt():
+    inFile, outFile, key = get_inputs()
+    plain_text = open(inFile, 'r').read()
+    n_rail =  len(key)
+    encrypted_text = encrypt_playfair(key, plain_text.lower())
+    print(encrypted_text)
+    transposed_text = codificaRailFence(encrypted_text,n_rail)
+
+    print(transposed_text)
+    output = open(outFile,"w")
+    output.write(transposed_text)
+    output.close()
+
+    print("Encryption finalized. Result in {}".format(outFile))
+encrypt()

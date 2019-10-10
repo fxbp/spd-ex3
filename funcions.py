@@ -1,5 +1,4 @@
 import string
-
 ## Métodes de railFence reaprofitats de l'exercici 1-----------------------------------------------
 
 def obtenirNovaPosicio(posicio, rail, desp, diff, mida):
@@ -52,6 +51,7 @@ def descodificaRailFence(missatge, num_rails):
 
     return "".join(str(x) for x in desxifrat)
 
+
 ## FUNCIONS PLAYFAIR ------------------------------------------------------------
 
 def get_possible_characters():
@@ -97,3 +97,20 @@ def preproces_playfair(text):
         result += text[i]
 
     return result
+
+def postproces_playfair(text):
+    result = text[0]
+    for i in range(1,len(text)-1):
+        if not (text[i]=='$' and text[i-1]==text[i+1]):
+            result += text[i]
+    result += text[len(text)-1]
+    print(text[len(text)-1])
+    return result
+
+def get_row_col(board, character, size):
+    for row in range(0,size):
+        for col in range(0,size):
+            if board[row][col] == character:
+                return row, col
+
+    return -1, -1
