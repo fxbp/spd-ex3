@@ -91,8 +91,9 @@ def populate_playfair(size, key):
 def preproces_playfair(text):
 #inserir caracter '$' entre els parell de lletres iguals
     result = text[0]
+    possible_chars= get_possible_characters()
     for i in range(1,len(text)):
-        if text[i]==text[i-1]:
+        if text[i] in possible_chars and text[i]==text[i-1]:
             result+='$'
         result += text[i]
 
@@ -104,7 +105,6 @@ def postproces_playfair(text):
         if not (text[i]=='$' and text[i-1]==text[i+1]):
             result += text[i]
     result += text[len(text)-1]
-    print(text[len(text)-1])
     return result
 
 def get_row_col(board, character, size):

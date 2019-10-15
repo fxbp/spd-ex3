@@ -30,28 +30,36 @@ def encrypt_playfair(key,text):
     to_encrypt = preproces_playfair(text)
     result = ""
     print(board)
-    #if len(to_encrypt)%2 != 0:
-    #    to_encrypt += ' '
-    for i in range(1,len(to_encrypt),2):
-        row, col = get_row_col(board,to_encrypt[i-1] ,BOARD_SIZE)
-        row2, col2 = get_row_col(board, to_encrypt[i],BOARD_SIZE)
-        to_add = ''
-        to_add2 = ''
+    possible_chars= get_possible_characters()
 
-        #Si les files son iguals, s'agafa el de la respectiva dreta circularment
-        if row == row2:
-            to_add = board[row][(col +1)% BOARD_SIZE]
-            to_add2 = board[row2][(col2 +1)% BOARD_SIZE]
-        elif col == col2:
-            # si les columnes son iguals, s'agafa el de abaix respectivament circularment
-            to_add = board[(row+1)%BOARD_SIZE][col]
-            to_add2 = board[(row2+1)%BOARD_SIZE][col2]
+    i = 0
+    while i<len(to_encrypt)-1:
+        if not to_encrypt[i] in possible_chars:
+            result+=to_encrypt[i]
+            i+=1
+        elif not to_encrypt[i+1] in possible_chars:
+            result+= to_encrypt[i] + to_encrypt[i+1]
+            i+=2
         else:
-            # altrament s'agafa el de la diagonal oposada
-            to_add = board[row][col2]
-            to_add2 = board[row2][col]
+            row, col = get_row_col(board,to_encrypt[i] ,BOARD_SIZE)
+            row2, col2 = get_row_col(board, to_encrypt[i+1],BOARD_SIZE)
+            to_add = ''
+            to_add2 = ''
+            #Si les files son iguals, s'agafa el de la respectiva dreta circularment
+            if row == row2:
+                to_add = board[row][(col +1)% BOARD_SIZE]
+                to_add2 = board[row2][(col2 +1)% BOARD_SIZE]
+            elif col == col2:
+                # si les columnes son iguals, s'agafa el de abaix respectivament circularment
+                to_add = board[(row+1)%BOARD_SIZE][col]
+                to_add2 = board[(row2+1)%BOARD_SIZE][col2]
+            else:
+                # altrament s'agafa el de la diagonal oposada
+                to_add = board[row2][col]
+                to_add2 = board[row][col2]
 
-        result += to_add + to_add2
+            i+=2
+            result += to_add + to_add2
 
     return result
 
@@ -60,12 +68,13 @@ def encrypt():
     plain_text = open(inFile, 'r').read()
     n_rail =  len(key)
     encrypted_text = encrypt_playfair(key, plain_text.lower())
-    print(encrypted_text)
+    #print(encrypted_text)
     transposed_text = codificaRailFence(encrypted_text,n_rail)
 
-    print(transposed_text)
+    #print(transposed_text)
     output = open(outFile,"w")
     output.write(transposed_text)
+    #output.write(encrypted_text)
     output.close()
 
     print("Encryption finalized. Result in {}".format(outFile))

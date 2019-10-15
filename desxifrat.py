@@ -16,28 +16,38 @@ def decrypt_playfair(key,text):
     board = populate_playfair(BOARD_SIZE,key)
     to_decypt = text
     result = ""
+    possible_chars= get_possible_characters()
 
-    for i in range(1,len(to_decypt),2):
-        row, col = get_row_col(board,to_decypt[i-1] ,BOARD_SIZE)
-        row2, col2 = get_row_col(board, to_decypt[i],BOARD_SIZE)
-        to_add = ''
-        to_add2 = ''
-
-        #Si les files son iguals, s'agafa el de la respectiva dreta circularment
-        if row == row2:
-            to_add = board[row][(col -1)% BOARD_SIZE]
-            to_add2 = board[row2][(col2 -1)% BOARD_SIZE]
-        elif col == col2:
-            to_add = board[(row-1)%BOARD_SIZE][col]
-            to_add2 = board[(row2-1)%BOARD_SIZE][col2]
+    i = 0
+    while i<len(to_decypt)-1:
+        if not to_decypt[i] in possible_chars:
+            result+=to_decypt[i]
+            i+=1
+        elif not to_decypt[i+1] in possible_chars:
+            result+= to_decypt[i] + to_decypt[i+1]
+            i+=2
         else:
-            to_add = board[row][col2]
-            to_add2 = board[row2][col]
+            row, col = get_row_col(board,to_decypt[i] ,BOARD_SIZE)
+            row2, col2 = get_row_col(board, to_decypt[i+1],BOARD_SIZE)
+            to_add = ''
+            to_add2 = ''
 
-        result += to_add + to_add2
+            #Si les files son iguals, s'agafa el de la respectiva dreta circularment
+            if row == row2:
+                to_add = board[row][(col -1)% BOARD_SIZE]
+                to_add2 = board[row2][(col2 -1)% BOARD_SIZE]
+            elif col == col2:
+                to_add = board[(row-1)%BOARD_SIZE][col]
+                to_add2 = board[(row2-1)%BOARD_SIZE][col2]
+            else:
+                to_add = board[row2][col]
+                to_add2 = board[row][col2]
+
+
+            result += to_add + to_add2
+            i+=2
 
     result = postproces_playfair(result)
-
     return result
 
 
@@ -47,10 +57,10 @@ def decrypt():
     encrypted_text = open(inFile, 'r').read()
     n_rail = len(key)
     to_decrypt = descodificaRailFence(encrypted_text,n_rail)
-    print(to_decrypt)
-    print(len(to_decrypt))
+    #print(to_decrypt)
     decrypted = decrypt_playfair(key,to_decrypt)
-    print(decrypted)
+    #decrypted = decrypt_playfair(key,encrypted_text)
+    #print(decrypted)
     output = open(outFile,"w")
     output.write(decrypted)
     output.close()
